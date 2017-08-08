@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-from captured_driver.captured_driver import CapturedDriver
+from capdriver.captured_driver import CapturedDriver
 
 if __name__ == "__main__":
     # For temp test
