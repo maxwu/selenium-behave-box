@@ -33,6 +33,7 @@ class CapturedDriver(WebDriver):
     def start_session(self, desired_capabilities, browser_profile):
         self.capabilities = {}
 
+    # return tupple of session ID and capability dict.
     @staticmethod
     def get_session_id_and_cap(command_executor=None):
         if not command_executor:
