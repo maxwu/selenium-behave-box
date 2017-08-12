@@ -3,7 +3,6 @@
 
 """Captured WebDriver
 Selenium WebDriver to capture existing session
-
 """
 from selenium import webdriver as wd
 from selenium.webdriver.remote.webdriver import WebDriver
@@ -11,12 +10,18 @@ import os
 import requests
 import json
 
+# for doctest
+from selenium.webdriver.firefox.firefox_binary import FirefoxBinary
+
 
 class CapturedDriver(WebDriver):
     """
-    >>> CapturedDriver.doctest_visit_github()
+    >>> doctest_ff_headless_visit_github()
+    PASS
+    >>> doctest_ff_visit_github()
     PASS
     """
+
     def __init__(self,
                  command_executor=None,
                  desired_capabilities={},
@@ -33,9 +38,9 @@ class CapturedDriver(WebDriver):
     def start_session(self, desired_capabilities, browser_profile):
         self.capabilities = {}
 
-    # return tupple of session ID and capability dict.
+    # return tuple of session ID and capabilities dict.
     @staticmethod
-    def get_session_id_and_cap(command_executor=None):
+    def get_session_id_and_capabilities(command_executor=None):
         if not command_executor:
             return None
 
@@ -52,20 +57,42 @@ class CapturedDriver(WebDriver):
         else:
             return None
 
-    # doctest on web driver title.
-    @staticmethod
-    def doctest_visit_github():
-        d = wd.Firefox()
-        d.get('http://github.com')
-        # "The world's leading software development platform · GitHub"
-        title1 = d.title
-        d2 = CapturedDriver(command_executor=d.command_executor, session_id=d.session_id, w3c=d.w3c)
-        title2 = d2.title
-        if title1 == title2:
-            print "PASS"
-        else:
-            print "driver title is %s, captured driver title is %s" % (title1, title2)
-        d.quit()
+
+# doctest on web driver title.
+def doctest_ff_visit_github():
+    binary = FirefoxBinary('/Applications/FirefoxDeveloperEdition.app/Contents/MacOS/firefox')
+    d = wd.Firefox(firefox_binary=binary)
+    d.get('http://github.com')
+    # "The world's leading software development platform · GitHub"
+    title1 = d.title
+    d2 = CapturedDriver(command_executor=d.command_executor, session_id=d.session_id, w3c=d.w3c)
+    title2 = d2.title
+    if title1 == title2:
+        print "PASS"
+    else:
+        print "driver title is %s, captured driver title is %s" % (title1, title2)
+    d.quit()
+
+
+# doctest on web driver title with headless FF
+# For headless FF, either MOZ_HEADLESS environment or -headless option specified in binary command.
+def doctest_ff_headless_visit_github():
+    os.environ['MOZ_HEADLESS'] = '1'
+    binary = FirefoxBinary('/Applications/FirefoxDeveloperEdition.app/Contents/MacOS/firefox')
+    d = wd.Firefox(firefox_binary=binary)
+
+    d.get('http://github.com')
+    # "The world's leading software development platform · GitHub"
+    title1 = d.title
+    d2 = CapturedDriver(command_executor=d.command_executor, session_id=d.session_id, w3c=d.w3c)
+    title2 = d2.title
+    if title1 == title2:
+        print "PASS"
+    else:
+        print "driver title is %s, captured driver title is %s" % (title1, title2)
+
+    d.quit()
+    del os.environ['MOZ_HEADLESS']
 
 if __name__ == "__main__":
     import doctest
